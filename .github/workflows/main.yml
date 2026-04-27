@@ -81,11 +81,8 @@ jobs:
 
       - name: Tag Docker Image
         run: |
-          docker tag actapp:${{ github.run_number }} \
-          ${{ secrets.REGISTRY }}/actapp:latest
-
-          docker tag actapp:${{ github.run_number }} \
-          ${{ secrets.REGISTRY }}/actapp:${{ github.run_number }}
+          docker tag actapp:${{ github.run_number }} ${{ secrets.REGISTRY }}/actapp:latest
+          docker tag actapp:${{ github.run_number }} ${{ secrets.REGISTRY }}/actapp:${{ github.run_number }}
 
       - name: Push Docker Images
         run: |

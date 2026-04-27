@@ -1,11 +1,9 @@
-FROM eclipse-temurin:11 AS build_image
+FROM maven:3.9.6-eclipse-temurin-11 AS build_image
 
-RUN apt-get update && apt-get install -y maven
-
-COPY ./vprofile-project /vprofile-project
+COPY . /vprofile-project
 WORKDIR /vprofile-project
 
-RUN mvn install
+RUN mvn clean package -DskipTests
 
 FROM tomcat:9-jre11
 

@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
 
 env:
-  AWS_REGION: us-east-2
+  AWS_REGION: eu-west-1
 
 jobs:
   Testing:
@@ -75,16 +75,13 @@ jobs:
           sed -i "s/^jdbc.password.*$/jdbc.password=${{ secrets.RDS_PASS }}/" src/main/resources/application.properties
           sed -i "s/db01/${{ secrets.RDS_ENDPOINT }}/" src/main/resources/application.properties
 
-      - name: Build Docker Image
+      - name: Build, Tag, and Push Docker Image
+        env:
+          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          REPOSITORY: test/myapp
+          IMAGE_TAG: ${{ github.run_number }}
         run: |
-          docker build -t actapp:${{ github.run_number }} .
-
-      - name: Tag Docker Image
-        run: |
-          docker tag actapp:${{ github.run_number }} ${{ secrets.REGISTRY }}/actapp:latest
-          docker tag actapp:${{ github.run_number }} ${{ secrets.REGISTRY }}/actapp:${{ github.run_number }}
-
-      - name: Push Docker Images
-        run: |
-          docker push ${{ secrets.REGISTRY }}/actapp:latest
-          docker push ${{ secrets.REGISTRY }}/actapp:${{ github.run_number }}
+          docker build -t $REGISTRY/$REPOSITORY:$IMAGE_TAG .
+          docker tag $REGISTRY/$REPOSITORY:$IMAGE_TAG $REGISTRY/$REPOSITORY:latest
+          docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
+          docker push $REGISTRY/$REPOSITORY:latest
